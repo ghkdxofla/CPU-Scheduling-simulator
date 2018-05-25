@@ -1,5 +1,7 @@
 #pragma once
 
+#include <time.h>
+
 // evaluation total structure
 typedef struct EvalTotal* PtrEvalTotal;
 typedef struct EvalTotal{
@@ -32,6 +34,6 @@ typedef struct Process{
 	EvalProcess eval_info; // evaluation information
 } Process;
 
-PtrProcess process_create();
-void process_delete(PtrProcess pc);
-PtrProcess process_random_gen();
+PtrProcess init_process();
+void free_process(PtrProcess pc);
+PtrProcess ran_process();
