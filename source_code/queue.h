@@ -2,29 +2,29 @@
 
 #include "process.h"
 
-typedef enum Standard {ARRIVAL, SHORTEST, PRIORITY, PID} Standard;
+typedef enum Standard { ARRIVAL, SHORTEST, PRIORITY, PID } Standard;
 
-// Node Ï†ïÏùò
+// Node ¡§¿«
 typedef struct Node* PtrNode;
 typedef struct Node {
-    PtrProcess data;
-    PtrNode next;
-    PtrNode prev;
+	PtrProcess data;
+	PtrNode next;
+	PtrNode prev;
 } Node;
 
 typedef struct Queue* PtrQueue;
 typedef struct Queue {
-  int count;
-  PtrNode front;
-  PtrNode end;
+	int count;
+	PtrNode front;
+	PtrNode end;
 } Queue;
 
-PtrNode init_node(); // node ÏÉùÏÑ±
-void free_node(PtrNode node); //node Ìï¥Ï†ú
+PtrNode init_node(); // node ª˝º∫
+void free_node(PtrNode node); //node «ÿ¡¶
 
-PtrQueue init_queue(); // queue ÏÉùÏÑ±
-void free_queue(PtrQueue queue); // queue Ìï†Îãπ Ìï¥Ï†ú
-PtrQueue copy_queue(PtrQueue queue); // queue Î≥µÏÇ¨
-PtrProcess pop_queue(PtrQueue queue); // index Î∞òÌôò
-void push_queue(PtrQueue queue, PtrProcess data); // queueÏóê Ï∂îÍ∞Ä
+PtrQueue init_queue(); // queue ª˝º∫
+void free_queue(PtrQueue queue); // queue «“¥Á «ÿ¡¶
+PtrQueue copy_queue(PtrQueue queue); // queue ∫πªÁ
+PtrProcess pop_queue(PtrQueue queue); // index π›»Ø
+void push_queue(PtrQueue queue, PtrProcess data); // queueø° √ﬂ∞°
 void sort_queue(PtrQueue queue, Standard way); // queue sort

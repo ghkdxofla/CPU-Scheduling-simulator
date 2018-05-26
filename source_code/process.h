@@ -1,19 +1,6 @@
 #pragma once
 
 #include <time.h>
-// evaluation total structure
-typedef struct EvalTotal* PtrEvalTotal;
-typedef struct EvalTotal {
-
-	int time_start; // start time
-	int time_end; // end time
-
-	double util_cpu; // CPU utilization
-	double throughput; // throught
-	double awt; // average waiting time
-	double att; // average turnaround time
-	double art; // average response time
-} EvalTotal;
 
 // evaluation process structure
 typedef struct EvalProcess{
@@ -37,6 +24,19 @@ typedef struct Process{
 	int priority; // priority, 1 ÀÌ»ף
 	EvalProcess eval_info; // evaluation information
 } Process;
+
+// evaluation total structure
+typedef struct EvalTotal* PtrEvalTotal;
+typedef struct EvalTotal {
+	int time_start; // start time
+	int time_end; // end time
+	double util_cpu; // CPU utilization
+	double throughput; // throught
+	double awt; // average waiting time
+	double att; // average turnaround time
+	double art; // average response time
+} EvalTotal;
+
 
 PtrEvalTotal init_evaluation();
 void free_evaluation(PtrEvalTotal et);

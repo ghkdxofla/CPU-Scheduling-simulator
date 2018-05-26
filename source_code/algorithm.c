@@ -84,6 +84,14 @@ void fcfs(PtrProcess run_s, PtrQueue job_q, PtrQueue ready_q, PtrQueue wait_q, P
 			}
 		}
 		// 아무튼 다 처리했으니 시간을...
+
+		// 확인용(추후 간트 차트로...)
+		if (run_s != NULL)
+			printf("[pid : %-5d] [CPU : %-5d] [I/O : %-5d] [time : %-5d]\n", run_s->pid, run_s->eval_info.remain_cpu, run_s->eval_info.remain_io, time);
+		else
+			printf("[pid : idle ] [CPU :      ] [I/O :      ] [time : %-5d]\n", time);
+
+
 		// cpu 1초 처리
 		if (run_s != NULL)
 			run_s->eval_info.remain_cpu--;
@@ -99,11 +107,13 @@ void fcfs(PtrProcess run_s, PtrQueue job_q, PtrQueue ready_q, PtrQueue wait_q, P
 				wait_q->front->data->eval_info.remain_io--;
 		}
 
+		
 		// 모든 작업 종료
 		if (job_q->count == 0 && term_q->count == count_process) {
+			result->util_cpu = (0.0 + time - idle_time) / time;
 			result->time_end = time; // 종료 시간
-			result->util_cpu = (time - idle_time) / time;
-			result->throughput = term_q->count / time;
+			
+			result->throughput = (0.0 + term_q->count) / time;
 			while (term_q->front) {
 				result->awt += term_q->front->data->eval_info.time_wait;
 				result->att += term_q->front->data->eval_info.time_turn;
@@ -114,14 +124,30 @@ void fcfs(PtrProcess run_s, PtrQueue job_q, PtrQueue ready_q, PtrQueue wait_q, P
 			result->awt /= count_process;
 			result->att /= count_process;
 			result->art /= count_process;
-			// 모든 큐 할당 해제
-			free_state(run_s, job_q, ready_q, wait_q, term_q, result);
+
+			
 			break;
 		}
-		printf("%d\n", time);
+		//printf("%d\n", time);
 		time++;
 	}
+	puts(".");
+	puts(".");
+	puts(".");
 	puts("JOB IS DONE!");
+	puts(".");
+	puts(".");
+	puts(".");
+	// 출력
+	puts("=============================================================================");
+	puts("start      end      CPU util      throughput      AWT      ATT      ART      ");
+	puts("");
+	printf("%-11d%-9d%-14.3f%-16.3f%-9.3f%-9.3f%-9.3f\n", result->time_start, result->time_end, result->util_cpu, result->throughput, result->awt, result->att, result->art);
+	puts("");
+	puts("=============================================================================");
+	// 모든 큐 할당 해제
+	free_state(run_s, job_q, ready_q, wait_q, term_q, result);
+	
 }// first-come, first-out
 void prem_sjf(PtrProcess run_s, PtrQueue job_q, PtrQueue ready_q, PtrQueue wait_q, PtrQueue term_q, PtrEvalTotal result) {
 	

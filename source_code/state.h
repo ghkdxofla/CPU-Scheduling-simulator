@@ -1,11 +1,6 @@
 #pragma once
 
 #include "queue.h"
-//typedef enum State {JOB, READY, RUN, WAIT, TERM} State;
-
-
-
-//void init_state(PtrQueue job_q, PtrQueue ready_q, PtrQueue run_q, PtrQueue wait_q, PtrQueue term_q); // queue í• ë‹¹
-void free_state(PtrProcess run_s, PtrQueue job_q, PtrQueue ready_q, PtrQueue wait_q, PtrQueue term_q, PtrEvalTotal result); // ëª¨ë“  queue ì‚­ì œ
-void save_state(PtrQueue job_q); // ìƒíƒœ ì €ì¥
-Queue load_state(char* file_name); //ìƒíƒœ ë¶ˆëŸ¬ì˜¤ê¸°
+void free_state(PtrProcess run_s, PtrQueue job_q, PtrQueue ready_q, PtrQueue wait_q, PtrQueue term_q, PtrEvalTotal result); // ¸ğµç queue »èÁ¦
+void save_state(PtrQueue job_q); // »óÅÂ ÀúÀå
+void load_state(PtrQueue init_q); //»óÅÂ ºÒ·¯¿À±â

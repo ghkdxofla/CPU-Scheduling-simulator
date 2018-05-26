@@ -11,19 +11,14 @@
 
 // create evaluation part
 PtrEvalTotal init_evaluation() {
-	PtrEvalTotal et = (PtrEvalTotal)malloc(sizeof(struct EvalTotal)); // ìµœì¢… ê²°ê³¼ê°€ ë‹´ê¸´ë‹¤
-	// í‰ê°€ êµ¬ì¡°ì²´ ì´ˆê¸°í™”
-	//if(et->time_start != 0)
-	et->time_start = -1; // ì²« í”„ë¡œì„¸ìŠ¤ ë„ì°© ì‹œê°„ìœ¼ë¡œ ì´ˆê¸°í™” ë¨
-	//if (et->time_end != 0)
-	et->time_end = 0; // ì¢…ë£Œ ì‹œê°„
-
+	PtrEvalTotal et = (PtrEvalTotal)malloc(sizeof(struct EvalTotal));
+	et->time_start = -1;
+	et->time_end = 0;
 	et->util_cpu = 0.0;
 	et->throughput = 0.0;
 	et->awt = 0.0;
 	et->att = 0.0;
 	et->art = 0.0;
-
 	return et;
 }
 // delete evaluation
@@ -31,61 +26,59 @@ void free_evaluation(PtrEvalTotal et) {
 	free(et);
 }
 // create process
-PtrProcess init_process(){
-  PtrProcess pc = (PtrProcess)malloc(sizeof(struct Process));
-  pc->pid = 0;
-  pc->burst_cpu = 0;
-  pc->burst_io = 0;
-  pc->arr_time = 0;
-  pc->priority = 0;
+PtrProcess init_process() {
+	PtrProcess pc = (PtrProcess)malloc(sizeof(struct Process));
+	pc->pid = 0;
+	pc->burst_cpu = 0;
+	pc->burst_io = 0;
+	pc->arr_time = 0;
+	pc->priority = 0;
 
-  pc->eval_info.remain_cpu = 0;
-  pc->eval_info.remain_io = 0;
-  pc->eval_info.time_res = -1; // ì²˜ìŒì—ë§Œ ê°’ ë³€ê²½í•˜ê¸° ìœ„í•¨
-  pc->eval_info.time_turn = 0;
-  pc->eval_info.time_wait = 0;
+	pc->eval_info.remain_cpu = 0;
+	pc->eval_info.remain_io = 0;
+	pc->eval_info.time_res = -1; // Ã³À½¿¡¸¸ °ª º¯°æÇÏ±â À§ÇÔ
+	pc->eval_info.time_turn = 0;
+	pc->eval_info.time_wait = 0;
 
-  pc->eval_info.time_start = 0;
-  pc->eval_info.time_pause = 0;
-  pc->eval_info.time_end = 0;
-  return pc;
+	pc->eval_info.time_start = 0;
+	pc->eval_info.time_pause = 0;
+	pc->eval_info.time_end = 0;
+	return pc;
 }
 
 // delete process
-void free_process(PtrProcess pc){
-  free(pc);
+void free_process(PtrProcess pc) {
+	free(pc);
 }
 
-PtrProcess ran_process(int pid){
-  PtrProcess pc = (PtrProcess)malloc(sizeof(struct Process));
-  // ì‹œë“œë¥¼ í†µí•œ ë‚œìˆ˜ ìƒì„±
-  //srand((unsigned)time(NULL));
-  pc->pid = pid; // ë°›ì•„ì˜¨ ê°’ì„ pidë¡œ ìƒì„±
-  pc->burst_cpu = (rand() % 10) + 1; // 1ë¶€í„° 100ê¹Œì§€ì˜ ê°’ ìƒì„±
-  pc->burst_io = rand() % 11; // 0ë¶€í„° 100ê¹Œì§€ì˜ ê°’ ìƒì„±
-  pc->arr_time = rand() % 11; // 0ë¶€í„° 1000ê¹Œì§€ì˜ ê°’ ìƒì„±
-  pc->priority = (rand() % 100) + 1; // 1ë¶€í„° 1000ê¹Œì§€ì˜ ê°’ ìƒì„±
+PtrProcess ran_process(int pid) {
+	PtrProcess pc = (PtrProcess)malloc(sizeof(struct Process));
+	pc->pid = pid; // ¹Ş¾Æ¿Â °ªÀ» pid·Î »ı¼º
+	pc->burst_cpu = (rand() % 10) + 1; // 1ºÎÅÍ 100±îÁöÀÇ °ª »ı¼º
+	pc->burst_io = rand() % 11; // 0ºÎÅÍ 100±îÁöÀÇ °ª »ı¼º
+	pc->arr_time = rand() % 11; // 0ºÎÅÍ 1000±îÁöÀÇ °ª »ı¼º
+	pc->priority = (rand() % 100) + 1; // 1ºÎÅÍ 1000±îÁöÀÇ °ª »ı¼º
 
-  pc->eval_info.remain_cpu = pc->burst_cpu;
-  pc->eval_info.remain_io = pc->burst_io;
-  pc->eval_info.time_res = -1;
-  pc->eval_info.time_turn = 0;
-  pc->eval_info.time_wait = 0;
+	pc->eval_info.remain_cpu = pc->burst_cpu;
+	pc->eval_info.remain_io = pc->burst_io;
+	pc->eval_info.time_res = -1;
+	pc->eval_info.time_turn = 0;
+	pc->eval_info.time_wait = 0;
 
-  pc->eval_info.time_start = 0;
-  pc->eval_info.time_pause = 0;
-  pc->eval_info.time_end = 0;
-  return pc;
+	pc->eval_info.time_start = 0;
+	pc->eval_info.time_pause = 0;
+	pc->eval_info.time_end = 0;
+	return pc;
 }
 
 /*
 int main(){
-  PtrProcess pc1 = init_process();
-  PtrProcess pc2 = ran_process();
-  printf("%d\n", pc2->pid);
-  free_process(pc1);
-  free_process(pc2);
-  printf("%d\n", pc2->pid);
-  return 0;
+PtrProcess pc1 = init_process();
+PtrProcess pc2 = ran_process();
+printf("%d\n", pc2->pid);
+free_process(pc1);
+free_process(pc2);
+printf("%d\n", pc2->pid);
+return 0;
 }
 */

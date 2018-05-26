@@ -13,11 +13,9 @@ void simulate(int algorithm, PtrQueue init_q) {
 	PtrQueue term_q = init_queue();
 	PtrProcess run_s = NULL;
 	PtrEvalTotal result = init_evaluation(); // 최종 결과가 담긴다
-	
+
 	int quant = 3; // rr의 time quantum
-	// 시작
-	puts("================================================");
-	puts("================================================");
+				   // 시작
 	switch (algorithm) {
 	case 0:
 		fcfs(run_s, job_q, ready_q, wait_q, term_q, result);
@@ -47,11 +45,8 @@ void simulate(int algorithm, PtrQueue init_q) {
 		puts("해당하는 알고리즘이 없습니다!");
 		break;
 	}
-	// 알고리즘 평가 출력
-	gets();
-	puts("================================================");
-	puts("================================================");
 }
+
 
 // 다 끝나면 init_q를 꼭 할당해제 해야 한다
 
@@ -60,19 +55,9 @@ int main(int argc, char* argv[]) {
 	srand((unsigned)time(NULL));
 	// init queue 초기화
 	PtrQueue init_q = init_queue();
-	
-	// random process 생성
-	for (int i = 0; i < 10; i++) {
-		PtrProcess pc = ran_process(i);
-		push_queue(init_q, pc);
-	}
-	
-	// 도착 순으로 정렬
-	sort_queue(init_q, ARRIVAL);
-
+	load_state(init_q);
 	// simulate
 	simulate(0, init_q);
-
 	// 끝나면 init_q 할당 해제
 	free_queue(init_q);
 	return 0;

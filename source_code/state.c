@@ -1,5 +1,5 @@
 /*
-state.cëŠ” queue ì²˜ë¦¬ë¥¼ ìœ„í•œ ë³´ì¡° í”„ë¡œê·¸ëž¨ìž„
+state.c´Â queue Ã³¸®¸¦ À§ÇÑ º¸Á¶ ÇÁ·Î±×·¥ÀÓ
 */
 
 #include <stdio.h>
@@ -8,23 +8,71 @@ state.cëŠ” queue ì²˜ë¦¬ë¥¼ ìœ„í•œ ë³´ì¡° í”„ë¡œê·¸ëž¨ìž„
 
 #include "state.h"
 
-void free_state(PtrProcess run_s, PtrQueue job_q, PtrQueue ready_q, PtrQueue wait_q, PtrQueue term_q, PtrEvalTotal result){
-  free_queue(job_q);
-  free_queue(ready_q);
-  free_queue(wait_q);
-  free_queue(term_q);
-  free_process(run_s);
-  free_evaluation(result);
+void free_state(PtrProcess run_s, PtrQueue job_q, PtrQueue ready_q, PtrQueue wait_q, PtrQueue term_q, PtrEvalTotal result) {
+	free_queue(job_q);
+	free_queue(ready_q);
+	free_queue(wait_q);
+	free_queue(term_q);
+	free_process(run_s);
+	free_evaluation(result);
 }
-void save_state(PtrQueue job_q){
-  //FILE *fp;
-  //fp = fopen("process_list.dat", "wb");
+void save_state(PtrQueue job_q) {
+	//FILE *fp;
+	//fp = fopen("process_list.dat", "wb");
 
 
+
+	/*
+	// random process »ý¼º
+	for (int i = 0; i < 10; i++) {
+	PtrProcess pc = ran_process(i);
+	push_queue(init_q, pc);
+	}
+	// µµÂø ¼øÀ¸·Î Á¤·Ä
+	sort_queue(init_q, ARRIVAL);
+	*/
 }
-/*
-Queue load_state(char* file_name){
-  Queue a;
-  return a;
+
+// ÆÄÀÏ·ÎºÎÅÍ ºÒ·¯¿È
+void load_state(PtrQueue init_q) {
+	puts("================================================================");
+	puts("¿ì¼±Àº ·£´ý »ý¼º");
+	puts("¸î °³ÀÇ ÇÁ·Î¼¼½º¸¦ »ý¼ºÇÏ½Ç °ÇÁö?");
+	int n = 10; // ±âº» 10°³
+	scanf("%d", &n);
+	// random process »ý¼º
+	for (int i = 0; i < n; i++) {
+		PtrProcess pc = ran_process(i);
+		push_queue(init_q, pc);
+	}
+	// µµÂø ¼øÀ¸·Î Á¤·Ä
+	sort_queue(init_q, ARRIVAL);
+
+	// Ãâ·Â
+	puts("================================================================");
+	puts("pid      CPU burst      IO burst      arrival time      priority");
+	PtrNode iter_node = init_q->front;
+	while (iter_node) {
+		printf("%-9d%-15d%-14d%-18d%-8d\n", iter_node->data->pid, iter_node->data->burst_cpu, iter_node->data->burst_io, iter_node->data->arr_time, iter_node->data->priority);
+		iter_node = iter_node->next;
+	}
+	puts("================================================================");
+
+
+
+
+	/*
+	puts("ºÒ·¯¿Ã ÇÁ·Î¼¼½º ÆÄÀÏ ÀÔ·Â");
+	char fname[256];
+	gets_s(fname, sizeof(fname));
+	FILE *file;
+
+	if (file = fopen(fname, "r")) {
+	// ¿©±â¿¡ ÇÁ·Î¼¼½º º¸¿©ÁÖ±â
+
+	}
+	else {
+	puts("ÇØ´çÇÏ´Â ÆÄÀÏÀÌ ¾ø½À´Ï´Ù!");
+	}
+	*/
 }
-*/
