@@ -106,7 +106,7 @@ void push_queue(PtrQueue queue, PtrProcess data){
 
 void sort_queue(PtrQueue queue, Standard way){
 	if (queue->count <= 1) {
-		printf("Don't need to sort\n");
+		//printf("Don't need to sort\n");
 		return;
 	}
 
@@ -134,7 +134,7 @@ void sort_queue(PtrQueue queue, Standard way){
 			}
 			// 짧은 시간으로 정렬
 			else if (way == SHORTEST) {
-				if (node->data->burst_cpu <= node_next->data->burst_cpu) {
+				if (node->data->eval_info.remain_cpu <= node_next->data->eval_info.remain_cpu) {
 					node = node->next; 
 					node_iter++; 
 					continue;

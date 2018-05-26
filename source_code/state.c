@@ -57,8 +57,22 @@ void load_state(PtrQueue init_q) {
 		iter_node = iter_node->next;
 	}
 	puts("================================================================");
-
-
+	/*
+	//  priority순으로 정렬
+	sort_queue(init_q, PRIORITY);
+	sort_queue(init_q, ARRIVAL);
+	*/
+	/*
+	// 출력
+	puts("================================================================");
+	puts("pid      CPU burst      IO burst      arrival time      priority");
+	iter_node = init_q->front;
+	while (iter_node) {
+		printf("%-9d%-15d%-14d%-18d%-8d\n", iter_node->data->pid, iter_node->data->burst_cpu, iter_node->data->burst_io, iter_node->data->arr_time, iter_node->data->priority);
+		iter_node = iter_node->next;
+	}
+	puts("================================================================");
+	*/
 
 
 	/*

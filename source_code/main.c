@@ -24,7 +24,7 @@ void simulate(int algorithm, PtrQueue init_q) {
 		//prem_sjf(run_s, job_q, ready_q, wait_q, term_q, result);
 		break;
 	case 2:
-		//nprem_sjf(run_s, job_q, ready_q, wait_q, term_q, result);
+		nprem_sjf(run_s, job_q, ready_q, wait_q, term_q, result);
 		break;
 	case 3:
 		//prem_priority(run_s, job_q, ready_q, wait_q, term_q, result);
@@ -57,7 +57,11 @@ int main(int argc, char* argv[]) {
 	PtrQueue init_q = init_queue();
 	load_state(init_q);
 	// simulate
+
+	// FCFS
 	simulate(0, init_q);
+	// Non-preemitive SJF
+	simulate(2, init_q);
 	// 끝나면 init_q 할당 해제
 	free_queue(init_q);
 	return 0;
