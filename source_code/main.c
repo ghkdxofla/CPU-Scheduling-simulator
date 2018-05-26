@@ -13,7 +13,7 @@ void simulate(int algorithm, PtrQueue init_q) {
 	PtrQueue term_q = init_queue();
 	PtrProcess run_s = NULL;
 	PtrEvalTotal result = init_evaluation(); // 최종 결과가 담긴다
-
+	
 	int quant = 3; // rr의 time quantum
 	// 시작
 	puts("================================================");
@@ -48,6 +48,7 @@ void simulate(int algorithm, PtrQueue init_q) {
 		break;
 	}
 	// 알고리즘 평가 출력
+	gets();
 	puts("================================================");
 	puts("================================================");
 }

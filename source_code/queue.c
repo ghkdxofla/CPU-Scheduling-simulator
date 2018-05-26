@@ -18,7 +18,7 @@ PtrNode init_node() {
 }
 
 void free_node(PtrNode node) {
-	
+	//free_process(node->data);
 	free(node);
 
 }
@@ -47,15 +47,17 @@ PtrQueue copy_queue(PtrQueue queue) {
 	PtrQueue copy = init_queue();
 	PtrNode queue_front = queue->front;
 	while (queue_front) {
-		PtrNode node = init_node();
+		PtrProcess pc = init_process();
 		// 값 복사 시작
-		node->data->arr_time = queue_front->data->arr_time;
-		node->data->burst_cpu = queue_front->data->burst_cpu;
-		node->data->burst_io = queue_front->data->burst_io;
-		node->data->eval_info = queue_front->data->eval_info;
-		node->data->pid = queue_front->data->pid;
-		node->data->priority = queue_front->data->priority;
+		pc->arr_time = queue_front->data->arr_time;
+		pc->burst_cpu = queue_front->data->burst_cpu;
+		pc->burst_io = queue_front->data->burst_io;
+		pc->eval_info = queue_front->data->eval_info;
+		pc->pid = queue_front->data->pid;
+		pc->priority = queue_front->data->priority;
 
+		// copy에 옮겨 담는다
+		push_queue(copy, pc);
 		queue_front = queue_front->next;
 	}
 	copy->count = queue->count;

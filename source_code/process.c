@@ -11,13 +11,15 @@
 
 // create evaluation part
 PtrEvalTotal init_evaluation() {
-	PtrEvalTotal et = (PtrEvalTotal)malloc(sizeof(struct EvalTotal));; // 최종 결과가 담긴다
-
+	PtrEvalTotal et = (PtrEvalTotal)malloc(sizeof(struct EvalTotal)); // 최종 결과가 담긴다
 	// 평가 구조체 초기화
+	//if(et->time_start != 0)
 	et->time_start = -1; // 첫 프로세스 도착 시간으로 초기화 됨
-	et->time_end = 0.0; // 종료 시간
+	//if (et->time_end != 0)
+	et->time_end = 0; // 종료 시간
+
 	et->util_cpu = 0.0;
-	et->throughput = 0;
+	et->throughput = 0.0;
 	et->awt = 0.0;
 	et->att = 0.0;
 	et->art = 0.0;
@@ -59,10 +61,10 @@ PtrProcess ran_process(int pid){
   // 시드를 통한 난수 생성
   //srand((unsigned)time(NULL));
   pc->pid = pid; // 받아온 값을 pid로 생성
-  pc->burst_cpu = (rand() % 100) + 1; // 1부터 100까지의 값 생성
-  pc->burst_io = rand() % 101; // 0부터 100까지의 값 생성
-  pc->arr_time = rand() % 1001; // 0부터 1000까지의 값 생성
-  pc->priority = (rand() % 1000) + 1; // 1부터 1000까지의 값 생성
+  pc->burst_cpu = (rand() % 10) + 1; // 1부터 100까지의 값 생성
+  pc->burst_io = rand() % 11; // 0부터 100까지의 값 생성
+  pc->arr_time = rand() % 11; // 0부터 1000까지의 값 생성
+  pc->priority = (rand() % 100) + 1; // 1부터 1000까지의 값 생성
 
   pc->eval_info.remain_cpu = pc->burst_cpu;
   pc->eval_info.remain_io = pc->burst_io;

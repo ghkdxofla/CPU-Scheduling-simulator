@@ -13,16 +13,20 @@ void fcfs(PtrProcess run_s, PtrQueue job_q, PtrQueue ready_q, PtrQueue wait_q, P
 		// job queue가 없는 경우 return
 		// job queue에서 ready queue로 넘어감(arrive)
 		if (job_q->count > 0) {
-			if (job_q->front->data->arr_time == time) {
+			while(job_q->front && job_q->front->data->arr_time == time) {
 				push_queue(ready_q, pop_queue(job_q));
 				// 최초의 process
-				if (result->time_start = -1) {
+				if (result->time_start == -1) {
 					result->time_start = time;
 					idle_time = 0;
 				}
 			}
-			else 
+			
+			if (result->time_start == -1) {
+				time++;
 				continue;
+			}
+			
 			
 		}		
 
@@ -31,22 +35,10 @@ void fcfs(PtrProcess run_s, PtrQueue job_q, PtrQueue ready_q, PtrQueue wait_q, P
 
 		// run state가 비었고, ready queue가 있을 경우
 
-		if (run_s == NULL){
-			// ready queue가 비었지만, wait queue에서 오는게 필요한 경우
-			if(!ready_q->front && wait_q->front->data->eval_info.remain_io == 0)
-				push_queue(ready_q, pop_queue(wait_q));
-			if (ready_q->front) 
-				run_s = pop_queue(ready_q);
-			else {
-				run_s = NULL;
-				time++;
-				idle_time++; // cpu가 아무것도 안하는 시간
-				continue;
-			}
-		}
+		
 
 		// run_s에 무엇인가 있을 경우
-
+		// 끝난 process 먼저 내보내거나 I/O 작업 시 waiting queue로 넘기기
 		if (run_s != NULL) {
 			// 작업이 마쳐졌는지부터 확인
 			if (run_s->eval_info.remain_cpu == 0) {
@@ -54,54 +46,58 @@ void fcfs(PtrProcess run_s, PtrQueue job_q, PtrQueue ready_q, PtrQueue wait_q, P
 				run_s->eval_info.time_end = time; // 종료 처리
 				run_s->eval_info.time_turn = run_s->eval_info.time_wait + run_s->burst_cpu; // turnaround 처리
 				push_queue(term_q, run_s);
-				// ready queue에서 꺼내 넣는다
-				if (ready_q->front)
-					run_s = pop_queue(ready_q);
-				else {
-					run_s = NULL;
-					time++;
-					idle_time++;
-					continue;
-				}
+				run_s = NULL;
 
 			}
 			// I/O 발생 시
-			if (run_s->burst_io > 0 && run_s->burst_cpu - run_s->eval_info.remain_cpu == 1) {
+			else if (run_s->burst_io > 0 && run_s->burst_cpu - run_s->eval_info.remain_cpu == 1) {
 				run_s->eval_info.time_pause = time;
 				push_queue(wait_q, run_s);
-				// ready queue에서 꺼내 넣는다
-				if (ready_q->front)
-					run_s = pop_queue(ready_q);
+				run_s = NULL;
+
+			}
+			
+		}
+
+		if (run_s == NULL) {
+			// ready queue가 비었지만, wait queue에서 오는게 필요한 경우
+			if (!ready_q->front && wait_q->front && wait_q->front->data->eval_info.remain_io == 0) {
+				push_queue(ready_q, pop_queue(wait_q));
+			}
+			if (ready_q->front) {
+				run_s = pop_queue(ready_q);
+				// 처음 들어온 경우
+				// response time 설정
+				if (run_s->eval_info.time_res == -1) {
+					run_s->eval_info.time_res = time - run_s->arr_time; // 경과 시간 - 도착 시간 => 응답 시간
+					run_s->eval_info.time_wait = run_s->eval_info.time_res;
+					run_s->eval_info.time_start = time;
+				}
+				// 처음 온것이 아니면
 				else {
-					run_s = NULL;
-					time++;
-					idle_time++;
-					continue;
-				} 
+					run_s->eval_info.time_wait += (time - run_s->eval_info.time_pause); // 에러 날 수도...?
+
+				}
 			}
-			// 처음 들어온 경우
-			// response time 설정
-			if (run_s->eval_info.time_res == -1) {
-				run_s->eval_info.time_res = time - run_s->arr_time; // 경과 시간 - 도착 시간 => 응답 시간
-				run_s->eval_info.time_wait = run_s->eval_info.time_res;
-				run_s->eval_info.time_start = time;
-			}
-			// 처음 온것이 아니면
 			else {
-				run_s->eval_info.time_wait += (time - run_s->eval_info.time_pause); // 에러 날 수도...?
-
+				idle_time++; // cpu가 아무것도 안하는 시간
 			}
-
-			// cpu 1초 처리
-			run_s->eval_info.remain_cpu--;
 		}
 		// 아무튼 다 처리했으니 시간을...
-
-
+		// cpu 1초 처리
+		if (run_s != NULL)
+			run_s->eval_info.remain_cpu--;
 		// waiting queue처리와 printf 해야 한다
+
 		// waiting queue
-		if(wait_q->front)
-			wait_q->front->data->eval_info.remain_io--;
+		// 0 된 process는 ready queue로 넘긴다
+		
+		if (wait_q->front) {
+			if(wait_q->front->data->eval_info.remain_io == 0)
+				push_queue(ready_q, pop_queue(wait_q));
+			else
+				wait_q->front->data->eval_info.remain_io--;
+		}
 
 		// 모든 작업 종료
 		if (job_q->count == 0 && term_q->count == count_process) {
@@ -122,10 +118,10 @@ void fcfs(PtrProcess run_s, PtrQueue job_q, PtrQueue ready_q, PtrQueue wait_q, P
 			free_state(run_s, job_q, ready_q, wait_q, term_q, result);
 			break;
 		}
-
+		printf("%d\n", time);
 		time++;
 	}
-	puts("JOB IS DONE!\n");
+	puts("JOB IS DONE!");
 }// first-come, first-out
 void prem_sjf(PtrProcess run_s, PtrQueue job_q, PtrQueue ready_q, PtrQueue wait_q, PtrQueue term_q, PtrEvalTotal result) {
 	

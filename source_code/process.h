@@ -4,8 +4,10 @@
 // evaluation total structure
 typedef struct EvalTotal* PtrEvalTotal;
 typedef struct EvalTotal {
+
 	int time_start; // start time
 	int time_end; // end time
+
 	double util_cpu; // CPU utilization
 	double throughput; // throught
 	double awt; // average waiting time
