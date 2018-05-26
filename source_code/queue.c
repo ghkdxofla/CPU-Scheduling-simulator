@@ -158,7 +158,7 @@ void sort_queue(PtrQueue queue, Standard way){
 
 			if (node == queue->front) {
 				queue->front = node_next;
-				node_next->prev = NULL;
+				temp_prev = NULL;
 			}
 			else {
 				temp_prev = node->prev;
@@ -166,7 +166,7 @@ void sort_queue(PtrQueue queue, Standard way){
 			}
 			if (node_next == queue->end) {
 				queue->end = node;
-				node->next = NULL;
+				temp_next = NULL;
 			}
 			else {
 				temp_next = node_next->next;
@@ -181,12 +181,13 @@ void sort_queue(PtrQueue queue, Standard way){
 			node->prev = node_next;
 
 
+
 			node->next = temp_next;
 			node_next->prev = temp_prev;
 
 
 			
-			node = node_next;
+			//node = node_next->next;
 			node_iter++;
 
 

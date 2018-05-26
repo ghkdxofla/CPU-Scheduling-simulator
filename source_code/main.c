@@ -61,7 +61,7 @@ int main(int argc, char* argv[]) {
 	PtrQueue init_q = init_queue();
 	
 	// random process »ý¼º
-	for (int i = 0; i < 4; i++) {
+	for (int i = 0; i < 10; i++) {
 		PtrProcess pc = ran_process(i);
 		push_queue(init_q, pc);
 	}
