@@ -9,6 +9,25 @@
 * purpose : create, delete and random generate process list.
 */
 
+// create evaluation part
+PtrEvalTotal init_evaluation() {
+	PtrEvalTotal et = (PtrEvalTotal)malloc(sizeof(struct EvalTotal));; // 최종 결과가 담긴다
+
+	// 평가 구조체 초기화
+	et->time_start = -1; // 첫 프로세스 도착 시간으로 초기화 됨
+	et->time_end = 0.0; // 종료 시간
+	et->util_cpu = 0.0;
+	et->throughput = 0;
+	et->awt = 0.0;
+	et->att = 0.0;
+	et->art = 0.0;
+
+	return et;
+}
+// delete evaluation
+void free_evaluation(PtrEvalTotal et) {
+	free(et);
+}
 // create process
 PtrProcess init_process(){
   PtrProcess pc = (PtrProcess)malloc(sizeof(struct Process));
@@ -17,11 +36,16 @@ PtrProcess init_process(){
   pc->burst_io = 0;
   pc->arr_time = 0;
   pc->priority = 0;
+
   pc->eval_info.remain_cpu = 0;
   pc->eval_info.remain_io = 0;
-  pc->eval_info.time_res = 0;
+  pc->eval_info.time_res = -1; // 처음에만 값 변경하기 위함
   pc->eval_info.time_turn = 0;
   pc->eval_info.time_wait = 0;
+
+  pc->eval_info.time_start = 0;
+  pc->eval_info.time_pause = 0;
+  pc->eval_info.time_end = 0;
   return pc;
 }
 
@@ -30,21 +54,25 @@ void free_process(PtrProcess pc){
   free(pc);
 }
 
-PtrProcess ran_process(){
+PtrProcess ran_process(int pid){
   PtrProcess pc = (PtrProcess)malloc(sizeof(struct Process));
   // 시드를 통한 난수 생성
   //srand((unsigned)time(NULL));
-  pc->pid = rand();
-  pc->burst_cpu = rand();
-  pc->burst_io = rand();
-  pc->arr_time = rand();
-  pc->priority = rand();
+  pc->pid = pid; // 받아온 값을 pid로 생성
+  pc->burst_cpu = (rand() % 100) + 1; // 1부터 100까지의 값 생성
+  pc->burst_io = rand() % 101; // 0부터 100까지의 값 생성
+  pc->arr_time = rand() % 1001; // 0부터 1000까지의 값 생성
+  pc->priority = (rand() % 1000) + 1; // 1부터 1000까지의 값 생성
 
   pc->eval_info.remain_cpu = pc->burst_cpu;
   pc->eval_info.remain_io = pc->burst_io;
-  pc->eval_info.time_res = 0;
+  pc->eval_info.time_res = -1;
   pc->eval_info.time_turn = 0;
   pc->eval_info.time_wait = 0;
+
+  pc->eval_info.time_start = 0;
+  pc->eval_info.time_pause = 0;
+  pc->eval_info.time_end = 0;
   return pc;
 }
 

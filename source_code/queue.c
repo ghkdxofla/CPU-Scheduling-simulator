@@ -167,10 +167,14 @@ void sort_queue(PtrQueue queue, Standard way){
 			}
 			node_next->next = node;
 			node->prev = node_next;
+
+
 			node->next = temp_next;
 			node_next->prev = temp_prev;
+
+
 			
-			
+			node = node->next;
 
 
 		}
