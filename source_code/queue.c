@@ -115,33 +115,43 @@ void sort_queue(PtrQueue queue, Standard way){
 	
 
 	PtrNode node_front = queue->front;
-	PtrNode node_end = queue->end;
-	while (node_end != NULL && node_end != queue->front) {
-		while (node != NULL && node != node_end) {
+	//PtrNode node_end = queue->end;
+	int node_iter = 0;
+	int count_end = queue->count - 1;
+	while (count_end > 0/*node_end != NULL && node_end != queue->front*/) {
+		while (node != NULL && node_iter < count_end/* && node != node_end*/) {
 			node_next = node->next;
 			// 도착 순으로 정렬
 			// 무조건 처음에는 도착 순으로 정렬을 한다
 			if (way == ARRIVAL) {
 				if (node->data->arr_time <= node_next->data->arr_time) {
-					node = node->next; continue;
+					node = node->next; 
+					node_iter++; 
+					continue;
 				}
 			}
 			// 짧은 시간으로 정렬
 			else if (way == SHORTEST) {
 				if (node->data->burst_cpu <= node_next->data->burst_cpu) {
-					node = node->next; continue;
+					node = node->next; 
+					node_iter++; 
+					continue;
 				}
 			}
 			// 우선순위로 정렬
 			else if (way == PRIORITY) {
 				if (node->data->priority <= node_next->data->priority) {
-					node = node->next; continue;
+					node = node->next; 
+					node_iter++; 
+					continue;
 				}
 			}
 			// pid로 정렬
 			else if (way == PID) {
 				if (node->data->pid <= node_next->data->pid) {
-					node = node->next; continue;
+					node = node->next;
+					node_iter++; 
+					continue;
 				}
 			}
 
@@ -162,9 +172,11 @@ void sort_queue(PtrQueue queue, Standard way){
 				temp_next = node_next->next;
 				node_next->next->prev = node;
 			}
+			/*
 			if (node_end == node_next) {
 				node_end = node;
 			}
+			*/
 			node_next->next = node;
 			node->prev = node_next;
 
@@ -174,11 +186,14 @@ void sort_queue(PtrQueue queue, Standard way){
 
 
 			
-			node = node->next;
+			node = node_next;
+			node_iter++;
 
 
 		}
-		node_end = node_end->prev;
+		node_iter = 0;
+		count_end--;
+		//node_end = node_end->prev;
 		node = queue->front;
 	}
 	
