@@ -30,7 +30,7 @@ PtrQueue init_queue(){
   queue->end = NULL;
   queue->count = 0;
   return queue;
-} // queue 생성
+} // queue ?�성
 
 void free_queue(PtrQueue queue){
   PtrNode node = queue->end;
@@ -41,14 +41,14 @@ void free_queue(PtrQueue queue){
 	free_node(node);
   }
   free(queue);
-} // queue 할당 해제
+} // queue ?�당 ?�제
 
 PtrQueue copy_queue(PtrQueue queue) {
 	PtrQueue copy = init_queue();
 	PtrNode queue_front = queue->front;
 	while (queue_front) {
 		PtrProcess pc = init_process();
-		// 값 복사 시작
+		// �?복사 ?�작
 		pc->arr_time = queue_front->data->arr_time;
 		pc->burst_cpu = queue_front->data->burst_cpu;
 		pc->burst_io = queue_front->data->burst_io;
@@ -56,7 +56,7 @@ PtrQueue copy_queue(PtrQueue queue) {
 		pc->pid = queue_front->data->pid;
 		pc->priority = queue_front->data->priority;
 
-		// copy에 옮겨 담는다
+		// copy????�� ?�는??
 		push_queue(copy, pc);
 		queue_front = queue_front->next;
 	}
@@ -101,7 +101,7 @@ void push_queue(PtrQueue queue, PtrProcess data){
     queue->end = node;
   }
   queue->count++;
-} // queue에 추가
+} // queue??추�?
 
 
 void sort_queue(PtrQueue queue, Standard way){
@@ -110,8 +110,8 @@ void sort_queue(PtrQueue queue, Standard way){
 		return;
 	}
 
-	PtrNode node = queue->front; // 정렬을 위함
-	PtrNode node_next = node; // 비교를 위함
+	PtrNode node = queue->front; // ?�렬???�함
+	PtrNode node_next = node; // 비교�??�함
 	PtrNode temp_prev = NULL;
 	PtrNode temp_next = NULL;
 	
@@ -123,8 +123,8 @@ void sort_queue(PtrQueue queue, Standard way){
 	while (count_end > 0/*node_end != NULL && node_end != queue->front*/) {
 		while (node != NULL && node_iter < count_end/* && node != node_end*/) {
 			node_next = node->next;
-			// 도착 순으로 정렬
-			// 무조건 처음에는 도착 순으로 정렬을 한다
+			// ?�착 ?�으�??�렬
+			// 무조�?처음?�는 ?�착 ?�으�??�렬???�다
 			if (way == ARRIVAL) {
 				if (node->data->arr_time <= node_next->data->arr_time) {
 					node = node->next; 
@@ -132,7 +132,7 @@ void sort_queue(PtrQueue queue, Standard way){
 					continue;
 				}
 			}
-			// 짧은 시간으로 정렬
+			// 짧�? ?�간?�로 ?�렬
 			else if (way == SHORTEST) {
 				if (node->data->eval_info.remain_cpu <= node_next->data->eval_info.remain_cpu) {
 					node = node->next; 
@@ -140,7 +140,7 @@ void sort_queue(PtrQueue queue, Standard way){
 					continue;
 				}
 			}
-			// 우선순위로 정렬
+			// ?�선?�위�??�렬
 			else if (way == PRIORITY) {
 				if (node->data->priority <= node_next->data->priority) {
 					node = node->next; 
@@ -148,7 +148,7 @@ void sort_queue(PtrQueue queue, Standard way){
 					continue;
 				}
 			}
-			// pid로 정렬
+			// pid�??�렬
 			else if (way == PID) {
 				if (node->data->pid <= node_next->data->pid) {
 					node = node->next;

@@ -45,9 +45,10 @@ void load_state(PtrQueue init_q) {
 		PtrProcess pc = ran_process(i);
 		push_queue(init_q, pc);
 	}
-	// 도착 순으로 정렬
+	// 도착 순으로 정렬, 같은 도착 시간이면 PID가 빠른 순으로 정렬됨
+	sort_queue(init_q, PID);
 	sort_queue(init_q, ARRIVAL);
-
+	
 	// 출력
 	puts("================================================================");
 	puts("pid      CPU burst      IO burst      arrival time      priority");

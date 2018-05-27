@@ -5,7 +5,7 @@
 #include "algorithm.h"
 
 // simulate and evaluate function
-void simulate(int algorithm, PtrQueue init_q) {
+void simulate(int solution, int quant, PtrQueue init_q) {
 	// 먼저 init_q를 job_q에 복사
 	PtrQueue job_q = copy_queue(init_q);
 	PtrQueue ready_q = init_queue();
@@ -14,8 +14,10 @@ void simulate(int algorithm, PtrQueue init_q) {
 	PtrProcess run_s = NULL;
 	PtrEvalTotal result = init_evaluation(); // 최종 결과가 담긴다
 
-	int quant = 3; // rr의 time quantum
-				   // 시작
+	// 시작
+	total_alg(solution, quant, run_s, job_q, ready_q, wait_q, term_q, result);
+
+	/*
 	switch (algorithm) {
 	case 0:
 		fcfs(run_s, job_q, ready_q, wait_q, term_q, result);
@@ -30,7 +32,7 @@ void simulate(int algorithm, PtrQueue init_q) {
 		//prem_priority(run_s, job_q, ready_q, wait_q, term_q, result);
 		break;
 	case 4:
-		//nprem_priority(run_s, job_q, ready_q, wait_q, term_q, result);
+		nprem_priority(run_s, job_q, ready_q, wait_q, term_q, result);
 		break;
 	case 5:
 		//rr(quant, run_s, job_q, ready_q, wait_q, term_q, result);
@@ -45,6 +47,7 @@ void simulate(int algorithm, PtrQueue init_q) {
 		puts("해당하는 알고리즘이 없습니다!");
 		break;
 	}
+	*/
 }
 
 
@@ -59,9 +62,15 @@ int main(int argc, char* argv[]) {
 	// simulate
 
 	// FCFS
-	simulate(0, init_q);
+	simulate(0, 0, init_q);
 	// Non-preemitive SJF
-	simulate(2, init_q);
+	simulate(1, 0, init_q);
+	// Preemitive SJF
+	simulate(2, 0, init_q);
+	// Non-preemitive Priority
+	simulate(3, 0, init_q);
+	// Preemitive Priority
+	simulate(4, 0, init_q);
 	// 끝나면 init_q 할당 해제
 	free_queue(init_q);
 	return 0;
