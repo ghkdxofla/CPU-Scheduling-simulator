@@ -12,7 +12,34 @@ void total_alg(int solution, int quantum, PtrProcess run_s, PtrQueue job_q, PtrQ
 	int idle_time = 0; // run state가 비어있는 시간
 
 	int quant_iter = quantum; // quantum을 사용하는 Round-robin의 iterator
-
+	
+	// 간트 차트 출력용
+	puts("||=================================|| --- GANTT CHART START!! ---");
+	switch (solution) {
+	case 0:
+		// FCFS
+		puts("");
+		break;
+	case 1:
+		// Non-preemitive SJF
+		sort_queue(ready_q, SHORTEST);
+		break;
+	case 2:
+		// Preemitive SJF
+		sort_queue(ready_q, SHORTEST);
+		break;
+	case 3:
+		// Non-preemitive Priority
+		sort_queue(ready_q, PRIORITY);
+		break;
+	case 4:
+		// Preemitive Priority
+		sort_queue(ready_q, PRIORITY);
+		break;
+	case 5:
+		// Round-robin
+		break;
+	}
 	while (time >= 0) {
 		// job queue가 없는 경우 return
 		// job queue에서 ready queue로 넘어감(arrive)
@@ -132,9 +159,16 @@ void total_alg(int solution, int quantum, PtrProcess run_s, PtrQueue job_q, PtrQ
 
 		// 확인용(추후 간트 차트로...)
 		if (run_s != NULL)
-			printf("[pid : %-5d] [CPU : %-5d] [I/O : %-5d] [time : %-5d]\n", run_s->pid, run_s->eval_info.remain_cpu, run_s->eval_info.remain_io, time);
-		else
-			printf("[pid : idle ] [CPU :      ] [I/O :      ] [time : %-5d]\n", time);
+			printf("||  pid : %-5d  ||  time : %-5d  || [CPU : %-5d] [I/O : %-5d]\n", run_s->pid, time, run_s->eval_info.remain_cpu, run_s->eval_info.remain_io);
+		else {
+			if (job_q->count == 0 && term_q->count == count_process){
+				printf("||  TERMINATION  ||  time : %-5d  || [TERMINATION] [TERMINATION]\n", time);
+				puts("||=================================|| --- GANTT CHART END!!!! ---");
+			}
+			else
+				printf("||  pid : idle   ||  time : %-5d  || [CPU :      ] [I/O :      ]\n", time);
+		}
+			
 
 
 		// cpu 1초 처리
@@ -191,6 +225,7 @@ void total_alg(int solution, int quantum, PtrProcess run_s, PtrQueue job_q, PtrQ
 	printf("%-11d%-9d%-14.3f%-16.3f%-9.3f%-9.3f%-9.3f\n", result->time_start, result->time_end, result->util_cpu, result->throughput, result->awt, result->att, result->art);
 	puts("");
 	puts("=============================================================================");
+	puts("=====================================================  Evaluation  ==========");
 	// 모든 큐 할당 해제
 	free_state(run_s, job_q, ready_q, wait_q, term_q, result);
 }

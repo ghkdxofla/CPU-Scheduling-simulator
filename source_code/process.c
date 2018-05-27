@@ -51,13 +51,13 @@ void free_process(PtrProcess pc) {
 	free(pc);
 }
 
-PtrProcess ran_process(int pid) {
+PtrProcess ran_process(int pid, int burst_cpu, int burst_io, int arr_time, int priority) {
 	PtrProcess pc = (PtrProcess)malloc(sizeof(struct Process));
 	pc->pid = pid; // 받아온 값을 pid로 생성
-	pc->burst_cpu = (rand() % 10) + 1; // 1부터 100까지의 값 생성
-	pc->burst_io = rand() % 11; // 0부터 100까지의 값 생성
-	pc->arr_time = rand() % 11; // 0부터 1000까지의 값 생성
-	pc->priority = (rand() % 100) + 1; // 1부터 1000까지의 값 생성
+	pc->burst_cpu = (rand() % burst_cpu) + 1; // 1부터 100까지의 값 생성
+	pc->burst_io = rand() % (burst_io + 1); // 0부터 100까지의 값 생성
+	pc->arr_time = rand() % (arr_time + 1); // 0부터 1000까지의 값 생성
+	pc->priority = (rand() % priority) + 1; // 1부터 1000까지의 값 생성
 
 	pc->eval_info.remain_cpu = pc->burst_cpu;
 	pc->eval_info.remain_io = pc->burst_io;

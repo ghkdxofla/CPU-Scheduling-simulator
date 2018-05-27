@@ -33,8 +33,7 @@ int load_state(PtrQueue init_q) {
 		int burst_io = -1;
 		int arr_time = -1;
 		int priority = -1;
-		
-		while(fscanf(file, " %d %d %d %d %d", &pid, &burst_cpu, &burst_io, &arr_time, &priority) == 2){
+		while(fscanf(file, " %d %d %d %d %d", &pid, &burst_cpu, &burst_io, &arr_time, &priority) != EOF){
 			PtrProcess pc = gen_process(pid, burst_cpu, burst_io, arr_time, priority);
 			push_queue(init_q, pc);
 			if (n % 3 == 0)
@@ -43,6 +42,7 @@ int load_state(PtrQueue init_q) {
 		}
 		puts("...DONE!!!");
 		puts("");
+		fclose(file);
 		if (init_q->count <= 0) {
 			puts("EMPTY FILE!!!");
 			return 0;
@@ -69,7 +69,11 @@ int load_state(PtrQueue init_q) {
 
 // process 불러옴
 int save_state(PtrQueue init_q, int n, char select) {
-
+	// 먼저 들어온 값 있으면 제거
+	while (init_q->front) {
+		PtrProcess pc_delete = pop_queue(init_q);
+		free_process(pc_delete);
+	}
 	if (select == '1') {
 		// manually
 		
@@ -90,8 +94,37 @@ int save_state(PtrQueue init_q, int n, char select) {
 	}
 	else if (select == '2') {
 		// random process 생성
+		puts("####  Generate  default  ####");
+		puts("1. Default (=100)       [ 1 ]");
+		puts("2. Set values    [ 2 OR ANY ]");
+		puts("");
+		int burst_cpu = 100;
+		int burst_io = 100;
+		int arr_time = 100;
+		int priority = 100;
+		char is_deafult = '1';
+		scanf(" %c", &is_deafult);
+		if (is_deafult != '1') {
+			while (1) {
+				puts("** Insert range of value **");
+				puts("** [ CPU burst >= 1 ] [IO burst >= 0 ] [ arrival time >= 0 ] [ priority >= 1 ] **");
+				puts("");
+				scanf(" %d %d %d %d", &burst_cpu, &burst_io, &arr_time, &priority);
+				if (burst_cpu >= 1 && burst_io >= 0 && arr_time >= 0 && priority >= 1) {
+					break;
+				}
+				else {
+					puts("OUT OF RANGE!!!");
+					burst_cpu = 100;
+					burst_io = 100;
+					arr_time = 100;
+					priority = 100;
+				}
+			}
+		}
+		
 		for (int i = 0; i < n; i++) {
-			PtrProcess pc = ran_process(i);
+			PtrProcess pc = ran_process(i, burst_cpu, burst_io, arr_time, priority);
 			push_queue(init_q, pc);
 		}
 	}
