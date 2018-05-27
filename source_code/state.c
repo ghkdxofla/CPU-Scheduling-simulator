@@ -17,6 +17,11 @@ void free_state(PtrProcess run_s, PtrQueue job_q, PtrQueue ready_q, PtrQueue wai
 	free_evaluation(result);
 }
 int load_state(PtrQueue init_q) {
+	// 먼저 들어온 값 있으면 제거
+	while (init_q->front) {
+		PtrProcess pc_delete = pop_queue(init_q);
+		free_process(pc_delete);
+	}
 	puts("");
 	puts("** Insert file name **");
 	puts("");
