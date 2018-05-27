@@ -71,6 +71,26 @@ PtrProcess ran_process(int pid) {
 	return pc;
 }
 
+PtrProcess gen_process(int pid, int burst_cpu, int burst_io, int arr_time, int priority) {
+	PtrProcess pc = (PtrProcess)malloc(sizeof(struct Process));
+	pc->pid = pid; // 받아온 값을 pid로 생성
+	pc->burst_cpu = burst_cpu; // 1부터 100까지의 값 생성
+	pc->burst_io = burst_io; // 0부터 100까지의 값 생성
+	pc->arr_time = arr_time; // 0부터 1000까지의 값 생성
+	pc->priority = priority; // 1부터 1000까지의 값 생성
+
+	pc->eval_info.remain_cpu = pc->burst_cpu;
+	pc->eval_info.remain_io = pc->burst_io;
+	pc->eval_info.time_res = -1;
+	pc->eval_info.time_turn = 0;
+	pc->eval_info.time_wait = 0;
+
+	pc->eval_info.time_start = 0;
+	pc->eval_info.time_pause = 0;
+	pc->eval_info.time_end = 0;
+	return pc;
+}
+
 /*
 int main(){
 PtrProcess pc1 = init_process();

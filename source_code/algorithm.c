@@ -40,33 +40,33 @@ void total_alg(int solution, int quantum, PtrProcess run_s, PtrQueue job_q, PtrQ
 		// run state가 비었고, ready queue가 있을 경우
 
 		//ready queue 만들기
-		if (wait_q->front && wait_q->front->data->eval_info.remain_io == 0) {
+		if (wait_q->front && wait_q->front->data->eval_info.remain_io == 0)
 			push_queue(ready_q, pop_queue(wait_q));
-			switch (solution) {
-			case 0:
-				// FCFS
-				break;
-			case 1:
-				// Non-preemitive SJF
-				sort_queue(ready_q, SHORTEST);
-				break;
-			case 2:
-				// Preemitive SJF
-				sort_queue(ready_q, SHORTEST);
-				break;
-			case 3:
-				// Non-preemitive Priority
-				sort_queue(ready_q, PRIORITY);
-				break;
-			case 4:
-				// Preemitive Priority
-				sort_queue(ready_q, PRIORITY);
-				break;
-			case 5:
-				// Round-robin
-				break;
-			}
+		switch (solution) {
+		case 0:
+			// FCFS
+			break;
+		case 1:
+			// Non-preemitive SJF
+			sort_queue(ready_q, SHORTEST);
+			break;
+		case 2:
+			// Preemitive SJF
+			sort_queue(ready_q, SHORTEST);
+			break;
+		case 3:
+			// Non-preemitive Priority
+			sort_queue(ready_q, PRIORITY);
+			break;
+		case 4:
+			// Preemitive Priority
+			sort_queue(ready_q, PRIORITY);
+			break;
+		case 5:
+			// Round-robin
+			break;
 		}
+		
 
 		// run_s에 무엇인가 있을 경우
 		// 끝난 process 먼저 내보내거나 I/O 작업 시 waiting queue로 넘기기
@@ -78,6 +78,8 @@ void total_alg(int solution, int quantum, PtrProcess run_s, PtrQueue job_q, PtrQ
 				run_s->eval_info.time_turn = run_s->eval_info.time_wait + run_s->burst_cpu; // turnaround 처리
 				push_queue(term_q, run_s);
 				run_s = NULL;
+				if (solution == 5)
+					quant_iter = quantum;
 
 			}
 			// I/O 발생 시
@@ -85,8 +87,24 @@ void total_alg(int solution, int quantum, PtrProcess run_s, PtrQueue job_q, PtrQ
 				run_s->eval_info.time_pause = time;
 				push_queue(wait_q, run_s);
 				run_s = NULL;
+				if (solution == 5)
+					quant_iter = quantum;
 			}
-			
+			// Preemitive 부분
+			else if (ready_q->front && (solution == 2 || solution == 4)) {
+				if ((solution == 2 && ready_q->front->data->eval_info.remain_cpu < run_s->eval_info.remain_cpu) || (solution == 4 && ready_q->front && ready_q->front->data->priority < run_s->priority)) {
+					run_s->eval_info.time_pause = time;
+					push_queue(ready_q, run_s);
+					run_s = NULL;
+				}
+			}
+			// Round-robin의 경우
+			else if (solution == 5 && quant_iter == 0) {
+				run_s->eval_info.time_pause = time;
+				push_queue(ready_q, run_s);
+				run_s = NULL;
+				quant_iter = quantum; // 다시 quantum 초기화
+			}
 		}
 
 
@@ -110,49 +128,6 @@ void total_alg(int solution, int quantum, PtrProcess run_s, PtrQueue job_q, PtrQ
 				idle_time++; // cpu가 아무것도 안하는 시간
 			}
 		}
-		else {
-			// Preemitive 부분
-			
-			if (solution == 2) {
-				if (ready_q->front && ready_q->front->data->eval_info.remain_cpu < run_s->eval_info.remain_cpu) {
-					run_s->eval_info.time_pause = time;
-					push_queue(ready_q, run_s);
-					run_s = pop_queue(ready_q);
-				}
-			}
-			else if (solution == 4) {
-				if (ready_q->front && ready_q->front->data->priority < run_s->priority) {
-					run_s->eval_info.time_pause = time;
-					push_queue(ready_q, run_s);
-					run_s = pop_queue(ready_q);
-				}
-			}
-			else if (solution == 5) {
-				// time quantum 처리
-
-				// quant가 다됐거나 ready queue가 없어도 빼놓고, 있으면 교체하고
-				if (ready_q->front && ready_q->front->data->priority < run_s->priority) {
-					run_s->eval_info.time_pause = time;
-					push_queue(ready_q, run_s);
-					run_s = pop_queue(ready_q);
-				}
-			}
-			if (run_s != NULL) {
-				// 처음 들어온 경우
-				// response time 설정
-				if (run_s->eval_info.time_res == -1) {
-					run_s->eval_info.time_res = time - run_s->arr_time; // 경과 시간 - 도착 시간 => 응답 시간
-					run_s->eval_info.time_wait = run_s->eval_info.time_res;
-					run_s->eval_info.time_start = time;
-				}
-				// 처음 온것이 아니면
-				else {
-					run_s->eval_info.time_wait += (time - run_s->eval_info.time_pause); // 에러 날 수도...?
-
-				}
-			}
-			
-		}
 		// 아무튼 다 처리했으니 시간을...
 
 		// 확인용(추후 간트 차트로...)
@@ -163,8 +138,11 @@ void total_alg(int solution, int quantum, PtrProcess run_s, PtrQueue job_q, PtrQ
 
 
 		// cpu 1초 처리
-		if (run_s != NULL)
+		if (run_s != NULL) {
 			run_s->eval_info.remain_cpu--;
+			if (solution == 5)
+				quant_iter--;
+		}
 		// waiting queue처리와 printf 해야 한다
 
 		// waiting queue
@@ -226,40 +204,7 @@ void simulate(int solution, int quant, PtrQueue init_q) {
 	PtrQueue term_q = init_queue();
 	PtrProcess run_s = NULL;
 	PtrEvalTotal result = init_evaluation(); // 최종 결과가 담긴다
-
-											 // 시작
+	// 시작
 	total_alg(solution, quant, run_s, job_q, ready_q, wait_q, term_q, result);
-
-	/*
-	switch (algorithm) {
-	case 0:
-	fcfs(run_s, job_q, ready_q, wait_q, term_q, result);
-	break;
-	case 1:
-	//prem_sjf(run_s, job_q, ready_q, wait_q, term_q, result);
-	break;
-	case 2:
-	nprem_sjf(run_s, job_q, ready_q, wait_q, term_q, result);
-	break;
-	case 3:
-	//prem_priority(run_s, job_q, ready_q, wait_q, term_q, result);
-	break;
-	case 4:
-	nprem_priority(run_s, job_q, ready_q, wait_q, term_q, result);
-	break;
-	case 5:
-	//rr(quant, run_s, job_q, ready_q, wait_q, term_q, result);
-	break;
-	case 6:
-	//hrrn(run_s, job_q, ready_q, wait_q, term_q, result);
-	break;
-	case 7:
-	//mlq(run_s, job_q, ready_q, wait_q, term_q, result);
-	break;
-	default:
-	puts("해당하는 알고리즘이 없습니다!");
-	break;
-	}
-	*/
 }
 

@@ -16,39 +16,43 @@ void free_state(PtrProcess run_s, PtrQueue job_q, PtrQueue ready_q, PtrQueue wai
 	free_process(run_s);
 	free_evaluation(result);
 }
-void save_state(PtrQueue job_q) {
-	//FILE *fp;
-	//fp = fopen("process_list.dat", "wb");
-
-
-
-	/*
-	// random process 생성
-	for (int i = 0; i < 10; i++) {
-	PtrProcess pc = ran_process(i);
-	push_queue(init_q, pc);
+int load_state(PtrQueue init_q) {
+	puts("");
+	puts("** Insert file name **");
+	puts("");
+	char name[256];
+	int n = 0;
+	scanf(" %s", name);
+	strcat(name, ".txt");
+	FILE *file = fopen(name, "r");
+	if (file != NULL) {
+		puts("...FILE PROCESSING...");
+		puts("");
+		int pid = -1;
+		int burst_cpu = -1;
+		int burst_io = -1;
+		int arr_time = -1;
+		int priority = -1;
+		
+		while(fscanf(file, " %d %d %d %d %d", &pid, &burst_cpu, &burst_io, &arr_time, &priority) == 2){
+			PtrProcess pc = gen_process(pid, burst_cpu, burst_io, arr_time, priority);
+			push_queue(init_q, pc);
+			if (n % 3 == 0)
+				printf("...");
+			n++;
+		}
+		puts("...DONE!!!");
+		puts("");
+		if (init_q->count <= 0) {
+			puts("EMPTY FILE!!!");
+			return 0;
+		}
 	}
-	// 도착 순으로 정렬
-	sort_queue(init_q, ARRIVAL);
-	*/
-}
-
-// 파일로부터 불러옴
-void load_state(PtrQueue init_q) {
-	puts("================================================================");
-	puts("우선은 랜덤 생성");
-	puts("몇 개의 프로세스를 생성하실 건지?");
-	int n = 10; // 기본 10개
-	scanf("%d", &n);
-	// random process 생성
-	for (int i = 0; i < n; i++) {
-		PtrProcess pc = ran_process(i);
-		push_queue(init_q, pc);
+	else {
+		puts("FILE NOT FOUND!!!");
+		return 0;
 	}
-	// 도착 순으로 정렬, 같은 도착 시간이면 PID가 빠른 순으로 정렬됨
-	sort_queue(init_q, PID);
-	sort_queue(init_q, ARRIVAL);
-	
+
 	// 출력
 	puts("================================================================");
 	puts("pid      CPU burst      IO burst      arrival time      priority");
@@ -58,36 +62,80 @@ void load_state(PtrQueue init_q) {
 		iter_node = iter_node->next;
 	}
 	puts("================================================================");
-	/*
-	//  priority순으로 정렬
-	sort_queue(init_q, PRIORITY);
+	printf("================================== %10d processes ========\n", n);
+	
+	return 1;
+}
+
+// process 불러옴
+int save_state(PtrQueue init_q, int n, char select) {
+
+	if (select == '1') {
+		// manually
+		
+		for (int i = 0; i < n; i++) {
+			puts("** Insert process information **");
+			puts("** [ CPU burst ] [IO burst ] [ arrival time ] [ priority ] **");
+			puts("");
+			int burst_cpu = -1;
+			int burst_io = -1;
+			int arr_time = -1;
+			int priority = -1;
+			scanf(" %d %d %d %d", &burst_cpu, &burst_io, &arr_time, &priority);
+
+			PtrProcess pc = gen_process(i, burst_cpu, burst_io, arr_time, priority);
+			push_queue(init_q, pc);
+		}
+
+	}
+	else if (select == '2') {
+		// random process 생성
+		for (int i = 0; i < n; i++) {
+			PtrProcess pc = ran_process(i);
+			push_queue(init_q, pc);
+		}
+	}
+	else {
+		puts("WRONG NUMBER!!!");
+		return 0;
+	}
+	// 도착 순으로 정렬, 같은 도착 시간이면 PID가 빠른 순으로 정렬됨
+	sort_queue(init_q, PID);
 	sort_queue(init_q, ARRIVAL);
-	*/
-	/*
+
 	// 출력
 	puts("================================================================");
 	puts("pid      CPU burst      IO burst      arrival time      priority");
-	iter_node = init_q->front;
+	PtrNode iter_node = init_q->front;
 	while (iter_node) {
 		printf("%-9d%-15d%-14d%-18d%-8d\n", iter_node->data->pid, iter_node->data->burst_cpu, iter_node->data->burst_io, iter_node->data->arr_time, iter_node->data->priority);
 		iter_node = iter_node->next;
 	}
 	puts("================================================================");
-	*/
 
-
-	/*
-	puts("불러올 프로세스 파일 입력");
-	char fname[256];
-	gets_s(fname, sizeof(fname));
-	FILE *file;
-
-	if (file = fopen(fname, "r")) {
-	// 여기에 프로세스 보여주기
-
+	printf("================================== %10d processes ========\n", n);
+	puts("");
+	puts("** Insert file name **");
+	puts("");
+	char name[256];
+	scanf(" %s", name);
+	strcat(name, ".txt");
+	FILE *file = fopen(name, "w");
+	if (file != NULL) {
+		iter_node = init_q->front;
+		while (iter_node) {
+			fprintf(file, "%d %d %d %d %d\n", iter_node->data->pid, iter_node->data->burst_cpu, iter_node->data->burst_io, iter_node->data->arr_time, iter_node->data->priority);
+			iter_node = iter_node->next;
+		}
+		puts("");
+		puts("** SAVED!!! **");
+		puts("");
+		fclose(file);
 	}
 	else {
-	puts("해당하는 파일이 없습니다!");
+		puts("FILE ERROR!!!");
+		return 0;
 	}
-	*/
+	return 1;
+	
 }

@@ -44,3 +44,4 @@ void free_evaluation(PtrEvalTotal et);
 PtrProcess init_process();
 void free_process(PtrProcess pc);
 PtrProcess ran_process(int pid);
+PtrProcess gen_process(int pid, int burst_cpu, int burst_io, int arr_time, int priority);
