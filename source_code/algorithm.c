@@ -77,8 +77,13 @@ void total_alg(int solution, int quantum, int io_when, PtrProcess run_s, PtrQueu
 		// run state가 비었고, ready queue가 있을 경우
 
 		//ready queue 만들기
-		if (wait_q->front && wait_q->front->data->eval_info.remain_io == 0)
-			push_queue(ready_q, pop_queue(wait_q));
+		if (wait_q->front && wait_q->front->data->eval_info.remain_io == 0) {
+			//if (wait_q->front->data->eval_info.remain_cpu > 0) {
+				push_queue(ready_q, pop_queue(wait_q));
+			//}
+			
+		}
+		
 		switch (solution) {
 		case 0:
 			// FCFS
@@ -115,20 +120,11 @@ void total_alg(int solution, int quantum, int io_when, PtrProcess run_s, PtrQueu
 
 		// run_s에 무엇인가 있을 경우
 		// 끝난 process 먼저 내보내거나 I/O 작업 시 waiting queue로 넘기기
-		if (run_s != NULL) {
-			// 작업이 마쳐졌는지부터 확인
-			if (run_s->eval_info.remain_cpu == 0) {
-				// 프로세스 처리
-				run_s->eval_info.time_end = time; // 종료 처리
-				run_s->eval_info.time_turn = run_s->eval_info.time_wait + run_s->burst_cpu; // turnaround 처리
-				push_queue(term_q, run_s);
-				run_s = NULL;
-				if (solution == 5)
-					quant_iter = quantum;
 
-			}
-			// I/O 발생 시  
-			else if (run_s->burst_io > 0 && run_s->eval_info.remain_io > 0){ 
+
+		if (run_s != NULL) {
+			// I/O 발생 시 
+			if (run_s->burst_io > 0 && run_s->eval_info.remain_io > 0) {
 				if (run_s->burst_cpu - run_s->eval_info.remain_cpu == io_when || (run_s->burst_cpu < io_when && run_s->eval_info.remain_cpu == 0)) { // 실행 후 얼마 뒤에 I/O 실행되는지 설정
 					run_s->eval_info.time_pause = time;
 					push_queue(wait_q, run_s);
@@ -137,45 +133,79 @@ void total_alg(int solution, int quantum, int io_when, PtrProcess run_s, PtrQueu
 						quant_iter = quantum;
 				}
 			}
-			// Preemitive 부분
-			else if (ready_q->front && (solution == 2 || solution == 4)) {
+			// 작업이 마쳐졌는지 확인
+			while (run_s != NULL && run_s->eval_info.remain_cpu == 0 && run_s->eval_info.remain_io == 0) {
+				// 프로세스 처리
+				run_s->eval_info.time_end = time; // 종료 처리
+				run_s->eval_info.time_turn = run_s->eval_info.time_wait + run_s->burst_cpu; // turnaround 처리
+
+				push_queue(term_q, run_s);
+				if (ready_q->front && ready_q->front->data->eval_info.remain_cpu == 0 && ready_q->front->data->eval_info.remain_io == 0) {
+					run_s = pop_queue(ready_q);
+					continue;
+				}
+				run_s = NULL;
+				if (solution == 5)
+					quant_iter = quantum;
+
+			}
+			if (run_s != NULL && ready_q->front && (solution == 2 || solution == 4 || solution == 5 || solution == 6 || solution == 7)) {
+				// Preemitive 부분
 				if ((solution == 2 && ready_q->front->data->eval_info.remain_cpu < run_s->eval_info.remain_cpu) || (solution == 4 && ready_q->front && ready_q->front->data->priority < run_s->priority)) {
 					run_s->eval_info.time_pause = time;
 					push_queue(ready_q, run_s);
 					run_s = NULL;
 				}
-			}
-			// HRRN
-			else if (ready_q->front && solution == 6) {
+				// Round-robin의 경우
+				if (solution == 5 && quant_iter == 0) {
+					run_s->eval_info.time_pause = time;
+					push_queue(ready_q, run_s);
 
-				//(0.0 + ready_q->front->data->eval_info.time_wait + ready_q->front->data->burst_cpu) / ready_q->front->data->burst_cpu <= (0.0 + run_s->>eval_info.time_wait + run_s->burst_cpu) / run_s->burst_cpu
-				if ((0.0 + ready_q->front->data->eval_info.time_wait + ready_q->front->data->burst_cpu) / ready_q->front->data->burst_cpu < (0.0 + run_s->eval_info.time_wait + run_s->burst_cpu) / run_s->burst_cpu) {
+					// 작업이 마쳐졌는지 확인
+					/*
+					while (run_s != NULL && run_s->eval_info.remain_cpu == 0 && run_s->eval_info.remain_io == 0) {
+						// 프로세스 처리
+						run_s->eval_info.time_end = time; // 종료 처리
+						run_s->eval_info.time_turn = run_s->eval_info.time_wait + run_s->burst_cpu; // turnaround 처리
+						push_queue(term_q, run_s);
+						if (ready_q->front && ready_q->front->data->eval_info.remain_cpu == 0 && ready_q->front->data->eval_info.remain_io == 0) {
+							run_s = pop_queue(ready_q);
+							continue;
+						}
+						run_s = NULL;
+						if (solution == 5)
+							quant_iter = quantum;
+
+					}
+					*/
+					run_s = NULL;
+					quant_iter = quantum; // 다시 quantum 초기화
+				}
+				// HRRN
+				if (solution == 6 && (0.0 + ready_q->front->data->eval_info.time_wait + ready_q->front->data->burst_cpu) / ready_q->front->data->burst_cpu < (0.0 + run_s->eval_info.time_wait + run_s->burst_cpu) / run_s->burst_cpu) {
 					run_s->eval_info.time_pause = time;
 					push_queue(ready_q, run_s);
 					run_s = NULL;
 				}
-			}
-			// Shortest I/O First
-			else if (ready_q->front && solution == 7) {
-
-				//ready_q->front->data->eval_info.remain_io <  run_s->eval_info.remain_io
-				if (ready_q->front->data->eval_info.remain_io <  run_s->eval_info.remain_io) {
+				// Shortest I/O First
+				if (solution == 7 && ready_q->front->data->eval_info.remain_io <  run_s->eval_info.remain_io) {
 					run_s->eval_info.time_pause = time;
 					push_queue(ready_q, run_s);
 					run_s = NULL;
 				}
-			}
-			// Round-robin의 경우
-			else if (solution == 5 && quant_iter == 0) {
-				run_s->eval_info.time_pause = time;
-				push_queue(ready_q, run_s);
-				run_s = NULL;
-				quant_iter = quantum; // 다시 quantum 초기화
+
 			}
 		}
-
-
 		if (run_s == NULL) {
+			while (ready_q->front && ready_q->front->data->eval_info.remain_cpu == 0 && ready_q->front->data->eval_info.remain_io == 0) {
+				run_s = pop_queue(ready_q);
+				run_s->eval_info.time_end = time; // 종료 처리
+				run_s->eval_info.time_turn = run_s->eval_info.time_wait + run_s->burst_cpu; // turnaround 처리
+				push_queue(term_q, run_s);
+				run_s = NULL;
+				if (solution == 5)
+					quant_iter = quantum;
+			}
 			if (ready_q->front) {
 				run_s = pop_queue(ready_q);
 				// 처음 들어온 경우
@@ -188,7 +218,6 @@ void total_alg(int solution, int quantum, int io_when, PtrProcess run_s, PtrQueu
 				// 처음 온것이 아니면
 				else {
 					run_s->eval_info.time_wait += (time - run_s->eval_info.time_pause); // 에러 날 수도...?
-
 				}
 			}
 			else {
@@ -208,9 +237,6 @@ void total_alg(int solution, int quantum, int io_when, PtrProcess run_s, PtrQueu
 			else
 				printf("||  pid : idle   ||  time : %-5d  || [CPU :      ] [I/O :      ]\n", time);
 		}
-			
-
-
 		// cpu 1초 처리
 		if (run_s != NULL) {
 			run_s->eval_info.remain_cpu--;
@@ -224,9 +250,6 @@ void total_alg(int solution, int quantum, int io_when, PtrProcess run_s, PtrQueu
 
 		if (wait_q->front)
 			wait_q->front->data->eval_info.remain_io--;
-
-
-
 		// 모든 작업 종료
 		if (job_q->count == 0 && term_q->count == count_process) {
 			result->util_cpu = (0.0 + time - idle_time) / time;

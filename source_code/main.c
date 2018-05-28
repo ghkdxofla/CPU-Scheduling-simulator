@@ -62,10 +62,16 @@ void cli_control(PtrQueue init_q) {
 			puts("0. Back           [ 0 OR ANY ]");
 			puts("");
 			scanf(" %c", &select);
-			puts("");
-			puts("** Insert I/O start time after process is started **");
-			puts("");
-			scanf(" %d", &io_when);
+			
+			
+			do {
+				puts("");
+				puts("** Insert I/O start time after process is started **");
+				puts("");
+				scanf(" %d", &io_when);
+				if (io_when < 1)
+					puts("NO UNDER ZERO!!!");
+			} while (io_when < 1);
 			switch (select) {
 			case '1':
 				// FCFS
