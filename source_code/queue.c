@@ -156,6 +156,21 @@ void sort_queue(PtrQueue queue, Standard way){
 					continue;
 				}
 			}
+			else if (way == HRRN) {
+				if ((0.0 + node->data->eval_info.time_wait + node->data->burst_cpu) / node->data->burst_cpu <= (0.0 + node_next->data->eval_info.time_wait + node_next->data->burst_cpu) / node_next->data->burst_cpu) {
+					node = node->next;
+					node_iter++;
+					continue;
+				}
+			}
+			// I / O가 다 끝난 애들을 제일 먼저 보내는 개념
+			else if (way == IO) {
+				if (node->data->eval_info.remain_io <= node_next->data->eval_info.remain_io) {
+					node = node->next;
+					node_iter++;
+					continue;
+				}
+			}
 
 
 			if (node == queue->front) {

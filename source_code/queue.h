@@ -2,7 +2,7 @@
 
 #include "process.h"
 
-typedef enum Standard { ARRIVAL, SHORTEST, PRIORITY, PID } Standard;
+typedef enum Standard { ARRIVAL, SHORTEST, PRIORITY, PID, HRRN, IO } Standard;
 
 // Node Á¤ÀÇ
 typedef struct Node* PtrNode;

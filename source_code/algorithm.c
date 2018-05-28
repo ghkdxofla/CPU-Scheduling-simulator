@@ -14,32 +14,42 @@ void total_alg(int solution, int quantum, PtrProcess run_s, PtrQueue job_q, PtrQ
 	int quant_iter = quantum; // quantum을 사용하는 Round-robin의 iterator
 	
 	// 간트 차트 출력용
-	puts("||=================================|| --- GANTT CHART START!! ---");
+	
 	switch (solution) {
 	case 0:
 		// FCFS
-		puts("");
+		puts("||#################################|| ###         FCFS        ###");
 		break;
 	case 1:
 		// Non-preemitive SJF
-		sort_queue(ready_q, SHORTEST);
+		puts("||#################################|| ###  Non-preemitive SJF ###");
 		break;
 	case 2:
 		// Preemitive SJF
-		sort_queue(ready_q, SHORTEST);
+		puts("||#################################|| ###    preemitive SJF   ###");
 		break;
 	case 3:
 		// Non-preemitive Priority
-		sort_queue(ready_q, PRIORITY);
+		puts("||#################################|| # Non-preemitive priority #");
 		break;
 	case 4:
 		// Preemitive Priority
-		sort_queue(ready_q, PRIORITY);
+		puts("||#################################|| ##  preemitive priority  ##");
 		break;
 	case 5:
 		// Round-robin
+		puts("||#################################|| ###      Round-robin    ###");
+		break;
+	case 6:
+		// HRRN
+		puts("||#################################|| ###         HRRN        ###");
+		break;
+	case 7:
+		// Shortest I/O First
+		puts("||#################################|| ##   Shortest I/O First  ##");
 		break;
 	}
+	puts("||=================================|| --- GANTT CHART START!! ---");
 	while (time >= 0) {
 		// job queue가 없는 경우 return
 		// job queue에서 ready queue로 넘어감(arrive)
@@ -92,6 +102,14 @@ void total_alg(int solution, int quantum, PtrProcess run_s, PtrQueue job_q, PtrQ
 		case 5:
 			// Round-robin
 			break;
+		case 6:
+			// HRRN
+			sort_queue(ready_q, HRRN);
+			break;
+		case 7:
+			// Shortest I/O First
+			sort_queue(ready_q, IO);
+			break;
 		}
 		
 
@@ -120,6 +138,26 @@ void total_alg(int solution, int quantum, PtrProcess run_s, PtrQueue job_q, PtrQ
 			// Preemitive 부분
 			else if (ready_q->front && (solution == 2 || solution == 4)) {
 				if ((solution == 2 && ready_q->front->data->eval_info.remain_cpu < run_s->eval_info.remain_cpu) || (solution == 4 && ready_q->front && ready_q->front->data->priority < run_s->priority)) {
+					run_s->eval_info.time_pause = time;
+					push_queue(ready_q, run_s);
+					run_s = NULL;
+				}
+			}
+			// HRRN
+			else if (ready_q->front && solution == 6) {
+
+				//(0.0 + ready_q->front->data->eval_info.time_wait + ready_q->front->data->burst_cpu) / ready_q->front->data->burst_cpu <= (0.0 + run_s->>eval_info.time_wait + run_s->burst_cpu) / run_s->burst_cpu
+				if ((0.0 + ready_q->front->data->eval_info.time_wait + ready_q->front->data->burst_cpu) / ready_q->front->data->burst_cpu < (0.0 + run_s->eval_info.time_wait + run_s->burst_cpu) / run_s->burst_cpu) {
+					run_s->eval_info.time_pause = time;
+					push_queue(ready_q, run_s);
+					run_s = NULL;
+				}
+			}
+			// Shortest I/O First
+			else if (ready_q->front && solution == 7) {
+
+				//ready_q->front->data->eval_info.remain_io <  run_s->eval_info.remain_io
+				if (ready_q->front->data->eval_info.remain_io <  run_s->eval_info.remain_io) {
 					run_s->eval_info.time_pause = time;
 					push_queue(ready_q, run_s);
 					run_s = NULL;
@@ -226,6 +264,8 @@ void total_alg(int solution, int quantum, PtrProcess run_s, PtrQueue job_q, PtrQ
 	puts("");
 	puts("=============================================================================");
 	puts("=====================================================  Evaluation  ==========");
+	puts("");
+	puts("");
 	// 모든 큐 할당 해제
 	free_state(run_s, job_q, ready_q, wait_q, term_q, result);
 }

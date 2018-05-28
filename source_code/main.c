@@ -55,7 +55,9 @@ void cli_control(PtrQueue init_q) {
 			puts("4. Non-premitive Prioirty[ 4 ]");
 			puts("5. Premitive Priority    [ 5 ]");
 			puts("6. Round-robin           [ 6 ]");
-			puts("7. ALL                   [ 7 ]");
+			puts("7. HRRN                  [ 7 ]");
+			puts("8. Shortest I/O First    [ 8 ]");
+			puts("9. ALL                   [ 9 ]");
 			puts("0. Back           [ 0 OR ANY ]");
 			puts("");
 			scanf(" %c", &select);
@@ -94,11 +96,21 @@ void cli_control(PtrQueue init_q) {
 				simulate(5, quantum, init_q);
 				break;
 			case '7':
+				// HRRN
+				simulate(6, 0, init_q);
+				break;
+			case '8':
+				// Shortest I/O First
+				simulate(7, 0, init_q);
+				break;
+			case '9':
 				simulate(0, 0, init_q);
 				simulate(1, 0, init_q);
 				simulate(2, 0, init_q);
 				simulate(3, 0, init_q);
 				simulate(4, 0, init_q);
+				simulate(6, 0, init_q);
+				simulate(7, 0, init_q);
 				puts("");
 				puts("** Insert time quantum for Round-robin **");
 				puts("");
