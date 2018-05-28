@@ -23,6 +23,7 @@ void cli_control(PtrQueue init_q) {
 		puts("");
 		char select;
 		int quantum = 0;
+		int io_when = 1; // 기본 1초 뒤
 		scanf(" %c", &select);
 		if (select == '1') {
 			puts("####   Load process   ####");
@@ -61,26 +62,30 @@ void cli_control(PtrQueue init_q) {
 			puts("0. Back           [ 0 OR ANY ]");
 			puts("");
 			scanf(" %c", &select);
+			puts("");
+			puts("** Insert I/O start time after process is started **");
+			puts("");
+			scanf(" %d", &io_when);
 			switch (select) {
 			case '1':
 				// FCFS
-				simulate(0, 0, init_q);
+				simulate(0, 0, io_when, init_q);
 				break;
 			case '2':
 				// Non-preemitive SJF
-				simulate(1, 0, init_q);
+				simulate(1, 0, io_when, init_q);
 				break;
 			case '3':
 				// Preemitive SJF
-				simulate(2, 0, init_q);
+				simulate(2, 0, io_when, init_q);
 				break;
 			case '4':
 				// Non-preemitive Priority
-				simulate(3, 0, init_q);
+				simulate(3, 0, io_when, init_q);
 				break;
 			case '5':
 				// Preemitive Priority
-				simulate(4, 0, init_q);
+				simulate(4, 0, io_when, init_q);
 				break;
 			case '6':
 				puts("");
@@ -93,24 +98,24 @@ void cli_control(PtrQueue init_q) {
 					if (quantum < 0)
 						puts("NO NEGATIVE NUMBER!!!");
 				} while (quantum < 0);
-				simulate(5, quantum, init_q);
+				simulate(5, quantum, io_when, init_q);
 				break;
 			case '7':
 				// HRRN
-				simulate(6, 0, init_q);
+				simulate(6, 0, io_when, init_q);
 				break;
 			case '8':
 				// Shortest I/O First
-				simulate(7, 0, init_q);
+				simulate(7, 0, io_when, init_q);
 				break;
 			case '9':
-				simulate(0, 0, init_q);
-				simulate(1, 0, init_q);
-				simulate(2, 0, init_q);
-				simulate(3, 0, init_q);
-				simulate(4, 0, init_q);
-				simulate(6, 0, init_q);
-				simulate(7, 0, init_q);
+				simulate(0, 0, io_when, init_q);
+				simulate(1, 0, io_when, init_q);
+				simulate(2, 0, io_when, init_q);
+				simulate(3, 0, io_when, init_q);
+				simulate(4, 0, io_when, init_q);
+				simulate(6, 0, io_when, init_q);
+				simulate(7, 0, io_when, init_q);
 				puts("");
 				puts("** Insert time quantum for Round-robin **");
 				puts("");
@@ -120,7 +125,7 @@ void cli_control(PtrQueue init_q) {
 					if(quantum < 0)
 						puts("NO NEGATIVE NUMBER!!!");
 				} while (quantum < 0);
-				simulate(5, quantum, init_q);
+				simulate(5, quantum, io_when, init_q);
 				break;
 			default:
 				break;

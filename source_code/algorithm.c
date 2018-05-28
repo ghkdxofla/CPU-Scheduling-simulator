@@ -5,7 +5,7 @@
 
 // cpu scheduling algorithm
 
-void total_alg(int solution, int quantum, PtrProcess run_s, PtrQueue job_q, PtrQueue ready_q, PtrQueue wait_q, PtrQueue term_q, PtrEvalTotal result) {
+void total_alg(int solution, int quantum, int io_when, PtrProcess run_s, PtrQueue job_q, PtrQueue ready_q, PtrQueue wait_q, PtrQueue term_q, PtrEvalTotal result) {
 
 	int count_process = job_q->count; // 종료 여부를 판단하기 위함
 	int time = 0; // 시작
@@ -127,13 +127,15 @@ void total_alg(int solution, int quantum, PtrProcess run_s, PtrQueue job_q, PtrQ
 					quant_iter = quantum;
 
 			}
-			// I/O 발생 시
-			else if (run_s->burst_io > 0 && run_s->burst_cpu - run_s->eval_info.remain_cpu == 1) {
-				run_s->eval_info.time_pause = time;
-				push_queue(wait_q, run_s);
-				run_s = NULL;
-				if (solution == 5)
-					quant_iter = quantum;
+			// I/O 발생 시  
+			else if (run_s->burst_io > 0 && run_s->eval_info.remain_io > 0){ 
+				if (run_s->burst_cpu - run_s->eval_info.remain_cpu == io_when || (run_s->burst_cpu < io_when && run_s->eval_info.remain_cpu == 0)) { // 실행 후 얼마 뒤에 I/O 실행되는지 설정
+					run_s->eval_info.time_pause = time;
+					push_queue(wait_q, run_s);
+					run_s = NULL;
+					if (solution == 5)
+						quant_iter = quantum;
+				}
 			}
 			// Preemitive 부분
 			else if (ready_q->front && (solution == 2 || solution == 4)) {
@@ -280,7 +282,7 @@ void total_alg(int solution, int quantum, PtrProcess run_s, PtrQueue job_q, PtrQ
 }
 
 // simulate and evaluate function
-void simulate(int solution, int quant, PtrQueue init_q) {
+void simulate(int solution, int quant, int io_when, PtrQueue init_q) {
 	// 먼저 init_q를 job_q에 복사
 	PtrQueue job_q = copy_queue(init_q);
 	PtrQueue ready_q = init_queue();
@@ -289,6 +291,6 @@ void simulate(int solution, int quant, PtrQueue init_q) {
 	PtrProcess run_s = NULL;
 	PtrEvalTotal result = init_evaluation(); // 최종 결과가 담긴다
 	// 시작
-	total_alg(solution, quant, run_s, job_q, ready_q, wait_q, term_q, result);
+	total_alg(solution, quant, io_when, run_s, job_q, ready_q, wait_q, term_q, result);
 }
 
