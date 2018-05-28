@@ -236,8 +236,17 @@ void total_alg(int solution, int quantum, PtrProcess run_s, PtrQueue job_q, PtrQ
 				result->att += term_q->front->data->eval_info.time_turn;
 				result->art += term_q->front->data->eval_info.time_res;
 				PtrProcess pc = pop_queue(term_q);
+
+				// 개별 프로세스의 정보 출력
+				puts("=============================================================================");
+				puts("pid        start       end        Waiting      Turnaround      Response      ");
+				puts("");
+				printf("%-11d%-12d%-11d%-13d%-16d%-14d\n", pc->pid, pc->eval_info.time_start, pc->eval_info.time_end, pc->eval_info.time_wait, pc->eval_info.time_turn, pc->eval_info.time_res);
+				puts("");
 				free_process(pc);
 			}
+			puts("=============================================================================");
+			puts("===============================================       Result       ==========");
 			result->awt /= count_process;
 			result->att /= count_process;
 			result->art /= count_process;
@@ -263,7 +272,7 @@ void total_alg(int solution, int quantum, PtrProcess run_s, PtrQueue job_q, PtrQ
 	printf("%-11d%-9d%-14.3f%-16.3f%-9.3f%-9.3f%-9.3f\n", result->time_start, result->time_end, result->util_cpu, result->throughput, result->awt, result->att, result->art);
 	puts("");
 	puts("=============================================================================");
-	puts("=====================================================  Evaluation  ==========");
+	puts("===============================================  Total Evaluation  ==========");
 	puts("");
 	puts("");
 	// 모든 큐 할당 해제
